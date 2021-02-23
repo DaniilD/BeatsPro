@@ -1,11 +1,13 @@
 version: "3.5"
 services:
   go:
-    build: ./build/docker/go/.Dockerfile
+    build:
+      context: .
+      dockerfile: ./build/docker/go/Dockerfile
     ports:
       - '80:80'
     volumes:
-      - ./:/app
+      - ./:/BeatsPro
 
   mysql:
     image: mariadb
@@ -19,7 +21,3 @@ services:
       MYSQL_USER: root
       MYSQL_PASSWORD: root
     restart: always
-
-networks:
-  app-network:
-    driver: bridge

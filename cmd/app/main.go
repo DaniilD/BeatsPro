@@ -1,8 +1,8 @@
 package main
 
 import (
-	"BeatsProApi/internal"
-	"BeatsProApi/internal/configs"
+	"BeatsPro/internal"
+	"BeatsPro/internal/configs"
 	"github.com/joho/godotenv"
 	"log"
 )
@@ -12,7 +12,6 @@ func init() {
 		log.Print("No .env file found")
 	}
 }
-
 
 func main() {
 	application := internal.NewApplication(configs.GetConfigLocator())

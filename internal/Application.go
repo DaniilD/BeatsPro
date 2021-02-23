@@ -1,7 +1,7 @@
 package internal
 
 import (
-	"BeatsProApi/internal/configs"
+	"BeatsPro/internal/configs"
 	"log"
 	"os"
 	"strconv"

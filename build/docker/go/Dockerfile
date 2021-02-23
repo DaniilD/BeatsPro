@@ -1,10 +1,8 @@
 FROM golang:latest
 
-WORKDIR /app
+WORKDIR /BeatsPro
 
-COPY ./ /app
-
-RUN go mod download
+COPY ./ /BeatsPro
 
 RUN go get github.com/githubnemo/CompileDaemon
 
