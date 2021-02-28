@@ -5,9 +5,10 @@ type DBConfig struct {
 	Host     string
 	User     string
 	Password string
+	Driver   string
+	SslMode  string
 	Port     int
 }
-
 
 func NewDBConfig() *DBConfig {
 	return &DBConfig{}

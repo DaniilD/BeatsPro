@@ -37,6 +37,8 @@ func (application *Application) configureDB() {
 	name := os.Getenv("DB_NAME")
 	user := os.Getenv("DB_USER")
 	password := os.Getenv("DB_PASSWORD")
+	driver := os.Getenv("DB_DRIVER")
+	sslMode := os.Getenv("DB_SSLMODE")
 	port, err := strconv.Atoi(os.Getenv("DB_PORT"))
 	if err != nil {
 		log.Fatal(err)
@@ -47,4 +49,6 @@ func (application *Application) configureDB() {
 	application.configLocator.DBConfigInstance().User = user
 	application.configLocator.DBConfigInstance().Password = password
 	application.configLocator.DBConfigInstance().Port = port
+	application.configLocator.DBConfigInstance().Driver = driver
+	application.configLocator.DBConfigInstance().SslMode = sslMode
 }
