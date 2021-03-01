@@ -2,6 +2,7 @@ package db
 
 import (
 	"BeatsPro/internal/configs"
+	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -35,4 +36,8 @@ func (store *MySqlStore) open() error {
 	store.db = db
 
 	return nil
+}
+
+func (store *MySqlStore) QueryRow(query string, args ...interface{}) *sql.Row {
+	return store.db.QueryRow(query, args...)
 }

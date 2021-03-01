@@ -1,8 +1,8 @@
 package Tag
 
 type Tag struct {
-	id    int
-	title string
+	Id    int
+	Title string
 }
 
 func NewTag() *Tag {
