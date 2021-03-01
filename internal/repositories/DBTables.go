@@ -1,3 +1,3 @@
 package repositories
 
-const TAGS = "Tags"
+const TAGS_TABLE = "Tags"
