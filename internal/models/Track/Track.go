@@ -9,7 +9,7 @@ type Track struct {
 	Description      string
 	DateTimeCreation time.Time
 	Duration         int
-	bpm              int
+	Bpm              int
 	IsDeleted        bool
 }
 

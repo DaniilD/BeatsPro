@@ -12,9 +12,9 @@ type User struct {
 	Type             int
 	DateTimeCreation time.Time
 	DateOfBirth      time.Time
-	IdDeleted        string
-	IsBanned         string
-	IsConfirmed      string
+	IsDeleted        bool
+	IsBanned         bool
+	IsConfirmed      bool
 }
 
 func NewUser() *User {

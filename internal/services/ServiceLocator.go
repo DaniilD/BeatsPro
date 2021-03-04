@@ -8,7 +8,8 @@ import (
 var serviceLocator *ServiceLocator
 
 type ServiceLocator struct {
-	tagService *TagService
+	tagService   *TagService
+	trackService *TrackService
 }
 
 func GetServiceLocator() *ServiceLocator {
@@ -22,8 +23,19 @@ func GetServiceLocator() *ServiceLocator {
 func (serviceLocator *ServiceLocator) GetTagService() *TagService {
 	if serviceLocator.tagService == nil {
 		serviceLocator.tagService = NewTagService(
-			repositories.NewTagRepository(db.GetStoreLocator().GetStore()))
+			repositories.NewTagRepository(
+				db.GetStoreLocator().GetStore()))
 	}
 
 	return serviceLocator.tagService
+}
+
+func (serviceLocator *ServiceLocator) GetTrackService() *TrackService {
+	if serviceLocator.trackService == nil {
+		serviceLocator.trackService = NewTrackService(
+			repositories.NewTrackRepository(
+				db.GetStoreLocator().GetStore()))
+	}
+
+	return serviceLocator.trackService
 }
