@@ -17,7 +17,27 @@ func NewUserRepository(store db.Store) *UserRepository {
 }
 
 func (userRepository *UserRepository) CreateUser(user *User.User) (int, error) {
-	return 0, nil
+	var id int64
+	sql := "INSERT INTO %s " +
+		"(`login`, `password`, `email`, `name`, `lastName`, `type`, `dateOfBirth`, " +
+		"`isDeleted`, `isBanned`, `isConfirmed`) " +
+		"VALUES " +
+		"('?', '?', '?', '?', '?', ?, '?', ?, ?, ?);"
+
+	query := fmt.Sprint(sql, USERS_TABLE)
+	result, err := userRepository.store.Exec(query)
+
+	if err != nil {
+		return 0, err
+	}
+
+	id, err = result.LastInsertId()
+
+	if err != nil {
+		return 0, err
+	}
+
+	return int(id), nil
 }
 
 func (userRepository *UserRepository) UpdateUser(user *User.User) error {
@@ -36,6 +56,23 @@ func (userRepository *UserRepository) UpdateUser(user *User.User) error {
 		"WHERE `id` = ?;"
 
 	query := fmt.Sprintf(sql, USERS_TABLE)
+
+	_, err := userRepository.store.Exec(query,
+		user.Login,
+		user.Password,
+		user.Email,
+		user.Name,
+		user.LastName,
+		user.Type,
+		user.DateTimeCreation,
+		user.DateOfBirth,
+		user.IsDeleted,
+		user.IsBanned,
+		user.IsConfirmed)
+
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
