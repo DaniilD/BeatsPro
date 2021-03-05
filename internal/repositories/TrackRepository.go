@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"BeatsPro/internal/db"
+	"BeatsPro/internal/models/Tag"
 	"BeatsPro/internal/models/Track"
 	"fmt"
 )
@@ -98,4 +99,17 @@ func (trackRepository *TrackRepository) GetById(id int) (*Track.Track, error) {
 	}
 
 	return track, nil
+}
+
+func (trackRepository *TrackRepository) AddTag(track Track.Track, tag Tag.Tag) error {
+	sql := "INSERT INTO %s (`trackId`, `tagId`) VALUES (?, ?)"
+	query := fmt.Sprintf(sql, TRACKS_TABLE)
+
+	_, err := trackRepository.store.Exec(query, track.Id, tag.Id)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"BeatsPro/internal/models/Tag"
 	"BeatsPro/internal/models/Track"
 	"BeatsPro/internal/repositories"
 )
@@ -25,4 +26,8 @@ func (trackService *TrackService) UpdateTrack(track *Track.Track) error {
 
 func (trackService *TrackService) GetById(id int) (*Track.Track, error) {
 	return trackService.trackRepository.GetById(id)
+}
+
+func (trackService *TrackService) AddTag(track Track.Track, tag Tag.Tag) error {
+	return trackService.trackRepository.AddTag(track, tag)
 }
