@@ -10,6 +10,7 @@ var serviceLocator *ServiceLocator
 type ServiceLocator struct {
 	tagService   *TagService
 	trackService *TrackService
+	userService  *UserService
 }
 
 func GetServiceLocator() *ServiceLocator {
@@ -38,4 +39,13 @@ func (serviceLocator *ServiceLocator) GetTrackService() *TrackService {
 	}
 
 	return serviceLocator.trackService
+}
+
+func (serviceLocator *ServiceLocator) GetUserService() *UserService {
+	if serviceLocator.userService == nil {
+		serviceLocator.userService = NewUserService(
+			repositories.NewUserRepository(db.GetStoreLocator().GetStore()))
+	}
+
+	return serviceLocator.userService
 }
