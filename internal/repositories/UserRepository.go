@@ -4,6 +4,7 @@ import (
 	"BeatsPro/internal/db"
 	"BeatsPro/internal/models/User"
 	"fmt"
+	"time"
 )
 
 type UserRepository struct {
@@ -24,8 +25,18 @@ func (userRepository *UserRepository) CreateUser(user *User.User) (int, error) {
 		"VALUES " +
 		"('?', '?', '?', '?', '?', ?, '?', ?, ?, ?);"
 
-	query := fmt.Sprint(sql, USERS_TABLE)
-	result, err := userRepository.store.Exec(query)
+	query := fmt.Sprintf(sql, USERS_TABLE)
+	result, err := userRepository.store.Exec(query,
+		user.Login,
+		user.Password,
+		user.Email,
+		user.Name,
+		user.LastName,
+		user.Type,
+		user.DateOfBirth.Format("YYYY-MM-DD"),
+		user.IsDeleted,
+		user.IsBanned,
+		user.IsConfirmed)
 
 	if err != nil {
 		return 0, err
@@ -48,7 +59,7 @@ func (userRepository *UserRepository) UpdateUser(user *User.User) error {
 		"`name` = '?', " +
 		"`lastName` = '?', " +
 		"`type` = ?, " +
-		"`dateTimeCreate` = '?', " +
+		"`dateTimeCreation` = '?', " +
 		"`dateOfBirth` = '?', " +
 		"`isDeleted` = ?, " +
 		"`isBanned` = ?, " +
@@ -77,17 +88,18 @@ func (userRepository *UserRepository) UpdateUser(user *User.User) error {
 	return nil
 }
 
-// dateTimeCreate -> DateTimeCreation
 func (userRepository *UserRepository) GetById(id int) (*User.User, error) {
 	sql := "SELECT " +
 		"`id`, `login`, `password`, `email`, `name`, `lastName`, `type`, " +
-		"`dateTimeCreate`, `dateOfBirth`, `isDeleted`, `isBanned`, `isConfirmed` " +
+		"`dateTimeCreation`, `dateOfBirth`, `isDeleted`, `isBanned`, `isConfirmed` " +
 		"FROM %s " +
 		"WHERE id = ?;"
 
 	query := fmt.Sprintf(sql, USERS_TABLE)
 	row := userRepository.store.QueryRow(query, id)
 	user := User.NewUser()
+	var dateOfBirth string
+	var dateTimeCreation string
 	err := row.Scan(
 		user.Id,
 		user.Login,
@@ -96,8 +108,8 @@ func (userRepository *UserRepository) GetById(id int) (*User.User, error) {
 		user.Name,
 		user.LastName,
 		user.Type,
-		user.DateTimeCreation,
-		user.DateOfBirth,
+		dateTimeCreation,
+		dateOfBirth,
 		user.IsDeleted,
 		user.IsBanned,
 		user.IsConfirmed)
@@ -105,6 +117,9 @@ func (userRepository *UserRepository) GetById(id int) (*User.User, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	user.DateOfBirth, _ = time.Parse("YYYY-MM-DD", dateOfBirth)
+	user.DateTimeCreation, _ = time.Parse("YYYY-MM-DD", dateTimeCreation)
 
 	return user, nil
 }

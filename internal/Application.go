@@ -2,6 +2,7 @@ package internal
 
 import (
 	"BeatsPro/internal/configs"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -9,10 +10,16 @@ import (
 
 type Application struct {
 	configLocator *configs.ConfigLocator
+	server        *Server
+	router        *Router
 }
 
-func NewApplication(configLocator *configs.ConfigLocator) *Application {
-	return &Application{configLocator: configLocator}
+func NewApplication(configLocator *configs.ConfigLocator, server *Server, router *Router) *Application {
+	return &Application{
+		configLocator: configLocator,
+		server:        server,
+		router:        router,
+	}
 }
 
 func (application *Application) Configure() {
@@ -51,4 +58,17 @@ func (application *Application) configureDB() {
 	application.configLocator.DBConfigInstance().Port = port
 	application.configLocator.DBConfigInstance().Driver = driver
 	application.configLocator.DBConfigInstance().SslMode = sslMode
+}
+
+func (application *Application) Run() {
+	port := application.configLocator.ServerConfigInstance().Port
+	host := application.configLocator.ServerConfigInstance().Host
+
+	if err := application.server.Run(host, fmt.Sprint(port), application.router); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (application *Application) InitRouts() {
+	application.router.InitRouts()
 }

@@ -14,6 +14,10 @@ func init() {
 }
 
 func main() {
-	application := internal.NewApplication(configs.GetConfigLocator())
+	server := internal.NewServer()
+	router := internal.NewRouterBuilder().Build()
+	application := internal.NewApplication(configs.GetConfigLocator(), server, router)
 	application.Configure()
+	application.InitRouts()
+	application.Run()
 }
