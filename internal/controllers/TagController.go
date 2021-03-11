@@ -4,7 +4,6 @@ import (
 	"BeatsPro/internal/requests"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 )
@@ -25,7 +24,5 @@ func (tagController *TagController) CreateTag(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	body, _ := ioutil.ReadAll(r.Body)
-	stringRequest := string(body)
-	fmt.Fprintln(os.Stdout, stringRequest)
+	fmt.Fprintln(os.Stdout, CreateTagRequest.Title)
 }
