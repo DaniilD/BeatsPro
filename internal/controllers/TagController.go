@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"BeatsPro/internal/models/Tag"
 	"BeatsPro/internal/requests"
+	requests_validators "BeatsPro/internal/requests/validators"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -9,10 +11,17 @@ import (
 )
 
 type TagController struct {
+	createTagRequestValidator *requests_validators.CreateTagRequestValidator
+	tagFactory                *Tag.TagFactory
 }
 
-func NewTagController() *TagController {
-	return &TagController{}
+func NewTagController(
+	createTagRequestValidator *requests_validators.CreateTagRequestValidator,
+	tagFactory *Tag.TagFactory) *TagController {
+	return &TagController{
+		createTagRequestValidator: createTagRequestValidator,
+		tagFactory:                tagFactory,
+	}
 }
 
 func (tagController *TagController) CreateTag(w http.ResponseWriter, r *http.Request) {
@@ -24,5 +33,13 @@ func (tagController *TagController) CreateTag(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	fmt.Fprintln(os.Stdout, CreateTagRequest.Title)
+	if err := tagController.createTagRequestValidator.Validate(&CreateTagRequest); err != nil {
+		// ошибка 400
+		fmt.Fprintln(os.Stdout, err)
+		return
+	}
+
+	tag := tagController.tagFactory.Make(CreateTagRequest.Tag.Title)
+
+	fmt.Fprintln(os.Stdout, tag.Title)
 }

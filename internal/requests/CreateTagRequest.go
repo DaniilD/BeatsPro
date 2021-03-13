@@ -1,5 +1,5 @@
 package requests
 
 type CreateTagRequest struct {
-	Title string `json:"title"`
+	Tag *Tag `json:"tag"`
 }
