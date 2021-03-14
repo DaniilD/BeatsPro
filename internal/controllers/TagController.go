@@ -96,3 +96,7 @@ func (tagController *TagController) UpdateTag(w http.ResponseWriter, r *http.Req
 
 	fmt.Fprintln(os.Stdout, "ok")
 }
+
+func (tagController *TagController) DeleteTag(w http.ResponseWriter, r *http.Request) {
+
+}
