@@ -3,6 +3,7 @@ package internal
 import (
 	"BeatsPro/internal/controllers"
 	"github.com/gorilla/mux"
+	"net/http"
 )
 
 type Router struct {
@@ -27,6 +28,7 @@ func (router *Router) InitRouts() {
 	router.muxRouter.HandleFunc("/user/register", router.userController.RegisterUser).Methods("POST")
 	router.muxRouter.HandleFunc("/user/login", router.userController.LoginUser).Methods("POST")
 
-	router.muxRouter.HandleFunc("/tag/create", router.tagController.CreateTag).Methods("POST")
-
+	router.muxRouter.HandleFunc("/tag/create", router.tagController.CreateTag).Methods(http.MethodPost)
+	router.muxRouter.HandleFunc("/tag/update/{id}", router.tagController.UpdateTag).Methods(http.MethodPut)
+	router.muxRouter.HandleFunc("/tag/delete/{id}", router.tagController.DeleteTag).Methods(http.MethodDelete)
 }

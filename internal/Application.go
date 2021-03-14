@@ -11,14 +11,13 @@ import (
 type Application struct {
 	configLocator *configs.ConfigLocator
 	server        *Server
-	router        *Router
+	Router        *Router
 }
 
-func NewApplication(configLocator *configs.ConfigLocator, server *Server, router *Router) *Application {
+func NewApplication(configLocator *configs.ConfigLocator, server *Server) *Application {
 	return &Application{
 		configLocator: configLocator,
 		server:        server,
-		router:        router,
 	}
 }
 
@@ -64,11 +63,11 @@ func (application *Application) Run() {
 	port := application.configLocator.ServerConfigInstance().Port
 	host := application.configLocator.ServerConfigInstance().Host
 
-	if err := application.server.Run(host, fmt.Sprint(port), application.router); err != nil {
+	if err := application.server.Run(host, fmt.Sprint(port), application.Router); err != nil {
 		log.Fatal(err)
 	}
 }
 
 func (application *Application) InitRouts() {
-	application.router.InitRouts()
+	application.Router.InitRouts()
 }

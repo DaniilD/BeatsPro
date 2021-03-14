@@ -4,7 +4,7 @@ import (
 	"BeatsPro/internal/controllers"
 	"BeatsPro/internal/models/Tag"
 	requests_validators "BeatsPro/internal/requests/validators"
-	requests_validators_rules "BeatsPro/internal/requests/validators/rules"
+	"BeatsPro/internal/services"
 	"github.com/gorilla/mux"
 )
 
@@ -20,9 +20,9 @@ func (routerFactory *RouterBuilder) Build() *Router {
 		mux.NewRouter(),
 		controllers.NewUserController(),
 		controllers.NewTagController(
-			requests_validators.NewCreateTagRequestValidator(
-				requests_validators_rules.NewNotEmptyRule()),
+			requests_validators.NewValidatorFactory(),
 			Tag.NewTagFactory(),
+			services.GetServiceLocator().GetTagService(),
 		),
 	)
 }

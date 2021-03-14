@@ -4,23 +4,29 @@ import (
 	"BeatsPro/internal/models/Tag"
 	"BeatsPro/internal/requests"
 	requests_validators "BeatsPro/internal/requests/validators"
+	"BeatsPro/internal/services"
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 type TagController struct {
-	createTagRequestValidator *requests_validators.CreateTagRequestValidator
-	tagFactory                *Tag.TagFactory
+	validatorFactory *requests_validators.ValidatorFactory
+	tagFactory       *Tag.TagFactory
+	tagService       *services.TagService
 }
 
 func NewTagController(
-	createTagRequestValidator *requests_validators.CreateTagRequestValidator,
-	tagFactory *Tag.TagFactory) *TagController {
+	validatorFactory *requests_validators.ValidatorFactory,
+	tagFactory *Tag.TagFactory,
+	tagService *services.TagService) *TagController {
 	return &TagController{
-		createTagRequestValidator: createTagRequestValidator,
-		tagFactory:                tagFactory,
+		validatorFactory: validatorFactory,
+		tagFactory:       tagFactory,
+		tagService:       tagService,
 	}
 }
 
@@ -33,13 +39,60 @@ func (tagController *TagController) CreateTag(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	if err := tagController.createTagRequestValidator.Validate(&CreateTagRequest); err != nil {
+	validator := tagController.validatorFactory.MakeCreateTagRequestValidator()
+	if err := validator.Validate(&CreateTagRequest); err != nil {
 		// ошибка 400
 		fmt.Fprintln(os.Stdout, err)
 		return
 	}
 
 	tag := tagController.tagFactory.Make(CreateTagRequest.Tag.Title)
+	id, err := tagController.tagService.CreateTag(tag)
 
-	fmt.Fprintln(os.Stdout, tag.Title)
+	if err != nil {
+		// ошибка 400
+		fmt.Fprintln(os.Stdout, err)
+	}
+
+	fmt.Fprintln(os.Stdout, id)
+}
+
+func (tagController *TagController) UpdateTag(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var updateTagRequest requests.UpdateTagRequest
+	params := mux.Vars(r)
+
+	paramsValidator := tagController.validatorFactory.MakeUpdateTagPathParamsValidator()
+
+	if err := paramsValidator.Validate(params); err != nil {
+		// ошибка 400
+		fmt.Fprintln(os.Stdout, err)
+		return
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&updateTagRequest); err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	requestValidator := tagController.validatorFactory.MakeUpdateTagRequestValidator()
+
+	if err := requestValidator.Validate(&updateTagRequest); err != nil {
+		// ошибка 400
+		fmt.Fprintln(os.Stdout, err)
+		return
+	}
+
+	//сначала получить тег потом обновить !!!!
+	tag := tagController.tagFactory.Make(updateTagRequest.Tag.Title)
+	tagId, _ := strconv.Atoi(params["id"])
+	tag.Id = tagId
+
+	if err := tagController.tagService.UpdateTag(tag); err != nil {
+		// ошибка 500
+		fmt.Fprintln(os.Stdout, err)
+		return
+	}
+
+	fmt.Fprintln(os.Stdout, "ok")
 }
