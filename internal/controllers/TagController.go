@@ -98,5 +98,26 @@ func (tagController *TagController) UpdateTag(w http.ResponseWriter, r *http.Req
 }
 
 func (tagController *TagController) DeleteTag(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+
+	paramsValidator := tagController.validatorFactory.MakeDeleteTagPathParamsValidator()
+
+	if err := paramsValidator.Validate(params); err != nil {
+		// ошибка 400
+		fmt.Fprintln(os.Stdout, err)
+		return
+	}
+
+	id, _ := strconv.Atoi(params["id"])
+	tag, err := tagController.tagService.GetById(id)
+
+	if err != nil {
+		// ошибка 400
+		fmt.Fprintln(os.Stdout, err)
+		return
+	}
+
+	err := tagController.tagService.UpdateTag(tag)
 
 }
