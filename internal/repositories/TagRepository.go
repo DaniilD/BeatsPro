@@ -18,8 +18,8 @@ func NewTagRepository(store db.Store) *TagRepository {
 
 func (tagRepository *TagRepository) CreateTag(tag *Tag.Tag) (int, error) {
 	var id int64
-	query := fmt.Sprintf("INSERT INTO %s (title) VALUES (?);", TAGS_TABLE)
-	result, err := tagRepository.store.Exec(query, tag.Title)
+	query := fmt.Sprintf("INSERT INTO %s (title, isDeleted) VALUES (?, ?);", TAGS_TABLE)
+	result, err := tagRepository.store.Exec(query, tag.Title, tag.IsDeleted)
 
 	if err != nil {
 		return 0, err
@@ -35,8 +35,8 @@ func (tagRepository *TagRepository) CreateTag(tag *Tag.Tag) (int, error) {
 }
 
 func (tagRepository *TagRepository) UpdateTag(tag *Tag.Tag) error {
-	query := fmt.Sprintf("UPDATE %s SET `title` = ? WHERE `id` = ?;", TAGS_TABLE)
-	_, err := tagRepository.store.Exec(query, tag.Title, tag.Id)
+	query := fmt.Sprintf("UPDATE %s SET `title` = ?, `isDeleted` = ? WHERE `id` = ?;", TAGS_TABLE)
+	_, err := tagRepository.store.Exec(query, tag.Title, tag.IsDeleted, tag.Id)
 
 	if err != nil {
 		return err
@@ -46,10 +46,10 @@ func (tagRepository *TagRepository) UpdateTag(tag *Tag.Tag) error {
 }
 
 func (tagRepository *TagRepository) GetById(id int) (*Tag.Tag, error) {
-	query := fmt.Sprintf("SELECT `id`, `title` FROM %s WHERE `id` = ?;", TAGS_TABLE)
+	query := fmt.Sprintf("SELECT `id`, `title`, `isDeleted` FROM %s WHERE `id` = ?;", TAGS_TABLE)
 	row := tagRepository.store.QueryRow(query, id)
 	tag := Tag.NewTag()
-	err := row.Scan(tag.Id, tag.Title)
+	err := row.Scan(tag.Id, tag.Title, tag.IsDeleted)
 
 	if err != nil {
 		return nil, err

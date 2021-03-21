@@ -4,6 +4,9 @@ import (
 	"BeatsPro/internal/models/Tag"
 	"BeatsPro/internal/requests"
 	requests_validators "BeatsPro/internal/requests/validators"
+	"BeatsPro/internal/response"
+	"BeatsPro/internal/response/consumerError"
+	"BeatsPro/internal/response/responseFactories"
 	"BeatsPro/internal/services"
 	"encoding/json"
 	"fmt"
@@ -14,19 +17,23 @@ import (
 )
 
 type TagController struct {
-	validatorFactory *requests_validators.ValidatorFactory
-	tagFactory       *Tag.TagFactory
-	tagService       *services.TagService
+	validatorFactory       *requests_validators.ValidatorFactory
+	tagFactory             *Tag.TagFactory
+	tagService             *services.TagService
+	responseFactoryLocator *responseFactories.ResponseFactoryLocator
 }
 
 func NewTagController(
 	validatorFactory *requests_validators.ValidatorFactory,
 	tagFactory *Tag.TagFactory,
-	tagService *services.TagService) *TagController {
+	tagService *services.TagService,
+	responseFactoryLocator *responseFactories.ResponseFactoryLocator) *TagController {
+
 	return &TagController{
-		validatorFactory: validatorFactory,
-		tagFactory:       tagFactory,
-		tagService:       tagService,
+		validatorFactory:       validatorFactory,
+		tagFactory:             tagFactory,
+		tagService:             tagService,
+		responseFactoryLocator: responseFactoryLocator,
 	}
 }
 
@@ -46,7 +53,7 @@ func (tagController *TagController) CreateTag(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	tag := tagController.tagFactory.Make(CreateTagRequest.Tag.Title)
+	tag := tagController.tagFactory.Make(CreateTagRequest.Tag.Title, false)
 	id, err := tagController.tagService.CreateTag(tag)
 
 	if err != nil {
@@ -54,7 +61,9 @@ func (tagController *TagController) CreateTag(w http.ResponseWriter, r *http.Req
 		fmt.Fprintln(os.Stdout, err)
 	}
 
-	fmt.Fprintln(os.Stdout, id)
+	response := tagController.responseFactoryLocator.GetCreateTagResponseFactory().Make(response.STATUS_SUCCESS, id)
+
+	json.NewEncoder(w).Encode(response)
 }
 
 func (tagController *TagController) UpdateTag(w http.ResponseWriter, r *http.Request) {
@@ -83,10 +92,18 @@ func (tagController *TagController) UpdateTag(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	//сначала получить тег потом обновить !!!!
-	tag := tagController.tagFactory.Make(updateTagRequest.Tag.Title)
 	tagId, _ := strconv.Atoi(params["id"])
-	tag.Id = tagId
+	tag, err := tagController.tagService.GetById(tagId)
+
+	if err != nil {
+		errorResponse := consumerError.NewError(1, "Тэг не найден")
+		responseError := consumerError.NewNotFoundErrorResponse(response.STATUS_ERROR, errorResponse)
+
+		json.NewEncoder(w).Encode(responseError)
+		return
+	}
+
+	tag.Title = updateTagRequest.Tag.Title
 
 	if err := tagController.tagService.UpdateTag(tag); err != nil {
 		// ошибка 500
@@ -117,7 +134,15 @@ func (tagController *TagController) DeleteTag(w http.ResponseWriter, r *http.Req
 		fmt.Fprintln(os.Stdout, err)
 		return
 	}
+	tag.IsDeleted = true
+	err = tagController.tagService.UpdateTag(tag)
 
-	err := tagController.tagService.UpdateTag(tag)
+	if err != nil {
+		// ошибка 500
+		fmt.Fprintln(os.Stdout, err)
+		return
+	}
+
+	fmt.Fprintln(os.Stdout, "ok")
 
 }
