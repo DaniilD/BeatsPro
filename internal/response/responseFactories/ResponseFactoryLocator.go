@@ -4,6 +4,7 @@ var responseFactoryLocator *ResponseFactoryLocator
 
 type ResponseFactoryLocator struct {
 	createTagResponseFactory *CreateTagResponseFactory
+	updateTagResponseFactory *UpdateTagResponseFactory
 }
 
 func GetResponseFactoryLocator() *ResponseFactoryLocator {
@@ -20,4 +21,12 @@ func (responseFactoryLocator *ResponseFactoryLocator) GetCreateTagResponseFactor
 	}
 
 	return responseFactoryLocator.createTagResponseFactory
+}
+
+func (responseFactoryLocator *ResponseFactoryLocator) GetUpdateTagResponseFactory() *UpdateTagResponseFactory {
+	if responseFactoryLocator.updateTagResponseFactory == nil {
+		responseFactoryLocator.updateTagResponseFactory = NewUpdateTagResponseFactory()
+	}
+
+	return responseFactoryLocator.updateTagResponseFactory
 }

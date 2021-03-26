@@ -40,7 +40,6 @@ func main() {
 	// Flush buffered events before the program terminates.
 	// Set the timeout to the maximum duration the program can afford to wait.
 	defer sentry.Flush(2 * time.Second)
-	sentry.CaptureMessage(" привет я даниил")
 
 	application.InitRouts()
 	application.Run()

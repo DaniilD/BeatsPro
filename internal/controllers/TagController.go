@@ -61,9 +61,13 @@ func (tagController *TagController) CreateTag(w http.ResponseWriter, r *http.Req
 		fmt.Fprintln(os.Stdout, err)
 	}
 
-	response := tagController.responseFactoryLocator.GetCreateTagResponseFactory().Make(response.STATUS_SUCCESS, id)
+	createTagResponse := tagController.responseFactoryLocator.GetCreateTagResponseFactory().Make(response.STATUS_SUCCESS, id)
 
-	json.NewEncoder(w).Encode(response)
+	err = json.NewEncoder(w).Encode(createTagResponse)
+
+	if err != nil {
+		//sentry capture error
+	}
 }
 
 func (tagController *TagController) UpdateTag(w http.ResponseWriter, r *http.Request) {
@@ -111,7 +115,13 @@ func (tagController *TagController) UpdateTag(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	fmt.Fprintln(os.Stdout, "ok")
+	updateTagResponse := tagController.responseFactoryLocator.GetUpdateTagResponseFactory().Make(response.STATUS_SUCCESS)
+
+	err = json.NewEncoder(w).Encode(updateTagResponse)
+
+	if err != nil {
+		//sentry capture error
+	}
 }
 
 func (tagController *TagController) DeleteTag(w http.ResponseWriter, r *http.Request) {
