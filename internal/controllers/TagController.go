@@ -153,6 +153,12 @@ func (tagController *TagController) DeleteTag(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	fmt.Fprintln(os.Stdout, "ok")
+	successResponse := response.NewSuccessResponse()
+
+	err = json.NewEncoder(w).Encode(successResponse)
+
+	if err != nil {
+		// sentry caputure error
+	}
 
 }

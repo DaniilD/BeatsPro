@@ -3,9 +3,11 @@ package internal
 import (
 	"BeatsPro/internal/configs"
 	"fmt"
+	"github.com/getsentry/sentry-go"
 	"log"
 	"os"
 	"strconv"
+	"time"
 )
 
 type Application struct {
@@ -24,6 +26,21 @@ func NewApplication(configLocator *configs.ConfigLocator, server *Server) *Appli
 func (application *Application) Configure() {
 	application.configureServer()
 	application.configureDB()
+	application.configureSentry()
+}
+
+func (application *Application) configureSentry() {
+	dsn := os.Getenv("SENTRY_DSN")
+	release := os.Getenv("SENTRY_RELEASE")
+	isDebug, err := strconv.Atoi(os.Getenv("SENTRY_DEBUG"))
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	application.configLocator.SentryConfigInstance().Dsn = dsn
+	application.configLocator.SentryConfigInstance().Release = release
+	application.configLocator.SentryConfigInstance().IsDebug = isDebug == 1
 }
 
 func (application *Application) configureServer() {
@@ -70,4 +87,28 @@ func (application *Application) Run() {
 
 func (application *Application) InitRouts() {
 	application.Router.InitRouts()
+}
+
+func (application *Application) InitSentry() {
+	dsn := application.configLocator.SentryConfigInstance().Dsn
+	release := application.configLocator.SentryConfigInstance().Release
+	isDebug := application.configLocator.SentryConfigInstance().IsDebug
+
+	err := sentry.Init(sentry.ClientOptions{
+		// Either set your DSN here or set the SENTRY_DSN environment variable.
+		Dsn: dsn,
+		// Either set environment and release here or set the SENTRY_ENVIRONMENT
+		// and SENTRY_RELEASE environment variables.
+		Environment: "",
+		Release:     release,
+		// Enable printing of SDK debug messages.
+		// Useful when getting started or trying to figure something out.
+		Debug: isDebug,
+	})
+	if err != nil {
+		log.Fatalf("sentry.Init: %s", err)
+	}
+	// Flush buffered events before the program terminates.
+	// Set the timeout to the maximum duration the program can afford to wait.
+	defer sentry.Flush(2 * time.Second)
 }

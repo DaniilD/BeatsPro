@@ -4,7 +4,8 @@ var configLocator *ConfigLocator
 
 type ConfigLocator struct {
 	serverConfig *ServerConfig
-	dbConfig	 *DBConfig
+	dbConfig     *DBConfig
+	sentryConfig *SentryConfig
 }
 
 func GetConfigLocator() *ConfigLocator {
@@ -23,10 +24,18 @@ func (configLocator *ConfigLocator) ServerConfigInstance() *ServerConfig {
 	return configLocator.serverConfig
 }
 
-func (configLocator *ConfigLocator) DBConfigInstance() *DBConfig{
+func (configLocator *ConfigLocator) DBConfigInstance() *DBConfig {
 	if configLocator.dbConfig == nil {
 		configLocator.dbConfig = NewDBConfig()
 	}
 
 	return configLocator.dbConfig
+}
+
+func (configLocator *ConfigLocator) SentryConfigInstance() *SentryConfig {
+	if configLocator.sentryConfig == nil {
+		configLocator.sentryConfig = NewSentryConfig()
+	}
+
+	return configLocator.sentryConfig
 }
