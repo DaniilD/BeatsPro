@@ -24,3 +24,7 @@ func (validatorFactory *ValidatorFactory) MakeUpdateTagRequestValidator() *Updat
 func (validatorFactory *ValidatorFactory) MakeDeleteTagPathParamsValidator() *DeleteTagPathParamsValidator {
 	return NewDeleteTagPathParamsValidator(requests_validators_rules.NewIsIntegerRule())
 }
+
+func (validatorFactory *ValidatorFactory) MakeGetByIdPathParamsValidator() *GetTagByIdPathParamsValidator {
+	return NewGetTagByIdPathParamsValidator(requests_validators_rules.NewIsIntegerRule())
+}

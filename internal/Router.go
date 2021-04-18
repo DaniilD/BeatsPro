@@ -31,4 +31,5 @@ func (router *Router) InitRouts() {
 	router.muxRouter.HandleFunc("/tag/create", router.tagController.CreateTag).Methods(http.MethodPost)
 	router.muxRouter.HandleFunc("/tag/update/{id}", router.tagController.UpdateTag).Methods(http.MethodPut)
 	router.muxRouter.HandleFunc("/tag/delete/{id}", router.tagController.DeleteTag).Methods(http.MethodDelete)
+	router.muxRouter.HandleFunc("/tag/{id}", router.tagController.GetTagById).Methods(http.MethodGet)
 }
