@@ -3,9 +3,10 @@ package responseFactories
 var responseFactoryLocator *ResponseFactoryLocator
 
 type ResponseFactoryLocator struct {
-	createTagResponseFactory *CreateTagResponseFactory
-	updateTagResponseFactory *UpdateTagResponseFactory
-	getByIdResponseFactory   *GetByIdResponseFactory
+	createTagResponseFactory     *CreateTagResponseFactory
+	updateTagResponseFactory     *UpdateTagResponseFactory
+	getByIdResponseFactory       *GetByIdResponseFactory
+	consumerErrorResponseFactory *ConsumerErrorResponseFactory
 }
 
 func GetResponseFactoryLocator() *ResponseFactoryLocator {
@@ -16,26 +17,34 @@ func GetResponseFactoryLocator() *ResponseFactoryLocator {
 	return responseFactoryLocator
 }
 
-func (responseFactoryLocator *ResponseFactoryLocator) GetCreateTagResponseFactory() *CreateTagResponseFactory {
-	if responseFactoryLocator.createTagResponseFactory == nil {
-		responseFactoryLocator.createTagResponseFactory = NewCreateTagResponseFactory()
+func (factoryLocator *ResponseFactoryLocator) GetCreateTagResponseFactory() *CreateTagResponseFactory {
+	if factoryLocator.createTagResponseFactory == nil {
+		factoryLocator.createTagResponseFactory = NewCreateTagResponseFactory()
 	}
 
-	return responseFactoryLocator.createTagResponseFactory
+	return factoryLocator.createTagResponseFactory
 }
 
-func (responseFactoryLocator *ResponseFactoryLocator) GetUpdateTagResponseFactory() *UpdateTagResponseFactory {
-	if responseFactoryLocator.updateTagResponseFactory == nil {
-		responseFactoryLocator.updateTagResponseFactory = NewUpdateTagResponseFactory()
+func (factoryLocator *ResponseFactoryLocator) GetUpdateTagResponseFactory() *UpdateTagResponseFactory {
+	if factoryLocator.updateTagResponseFactory == nil {
+		factoryLocator.updateTagResponseFactory = NewUpdateTagResponseFactory()
 	}
 
-	return responseFactoryLocator.updateTagResponseFactory
+	return factoryLocator.updateTagResponseFactory
 }
 
-func (responseFactoryLocator *ResponseFactoryLocator) GetByIdResponseFactory() *GetByIdResponseFactory {
-	if responseFactoryLocator.getByIdResponseFactory == nil {
-		responseFactoryLocator.getByIdResponseFactory = NewGetByIdResponseFactory()
+func (factoryLocator *ResponseFactoryLocator) GetByIdResponseFactory() *GetByIdResponseFactory {
+	if factoryLocator.getByIdResponseFactory == nil {
+		factoryLocator.getByIdResponseFactory = NewGetByIdResponseFactory()
 	}
 
-	return responseFactoryLocator.getByIdResponseFactory
+	return factoryLocator.getByIdResponseFactory
+}
+
+func (factoryLocator *ResponseFactoryLocator) GetConsumerErrorResponseFactory() *ConsumerErrorResponseFactory {
+	if factoryLocator.consumerErrorResponseFactory == nil {
+		factoryLocator.consumerErrorResponseFactory = new(ConsumerErrorResponseFactory)
+	}
+
+	return factoryLocator.consumerErrorResponseFactory
 }

@@ -2,6 +2,7 @@ package operations
 
 import (
 	"BeatsPro/internal/models/Tag"
+	"BeatsPro/internal/operations/operationErrors"
 	"BeatsPro/internal/requests"
 	requests_validators "BeatsPro/internal/requests/validators"
 	"BeatsPro/internal/response"
@@ -35,11 +36,11 @@ func (operation *CreateTagOperation) Handle(r *http.Request) (interface{}, error
 	var createTagRequest requests.CreateTagRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&createTagRequest); err != nil {
-		return nil, err
+		return nil, new(operationErrors.JsonInvalidStructError)
 	}
 
 	if err := operation.validate(&createTagRequest); err != nil {
-		return nil, err
+		return nil, operationErrors.NewValidateError(err.Error())
 	}
 
 	tag := operation.tagFactory.Make(createTagRequest.Tag.Title, false)

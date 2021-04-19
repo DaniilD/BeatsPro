@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"BeatsPro/internal/Enums"
 	"BeatsPro/internal/models/Tag"
 	"BeatsPro/internal/operations"
+	"BeatsPro/internal/operations/operationErrors"
 	"BeatsPro/internal/requests"
 	requests_validators "BeatsPro/internal/requests/validators"
 	"BeatsPro/internal/response"
@@ -20,6 +22,7 @@ import (
 
 type TagController struct {
 	createTagOperation     *operations.CreateTagOperation
+	consumerErrorFactory   *responseFactories.ConsumerErrorResponseFactory
 	validatorFactory       *requests_validators.ValidatorFactory
 	tagFactory             *Tag.TagFactory
 	tagService             *services.TagService
@@ -28,6 +31,7 @@ type TagController struct {
 
 func NewTagController(
 	createTagOperation *operations.CreateTagOperation,
+	consumerErrorFactory *responseFactories.ConsumerErrorResponseFactory,
 	validatorFactory *requests_validators.ValidatorFactory,
 	tagFactory *Tag.TagFactory,
 	tagService *services.TagService,
@@ -35,6 +39,7 @@ func NewTagController(
 
 	return &TagController{
 		createTagOperation:     createTagOperation,
+		consumerErrorFactory:   consumerErrorFactory,
 		validatorFactory:       validatorFactory,
 		tagFactory:             tagFactory,
 		tagService:             tagService,
@@ -48,7 +53,13 @@ func (controller *TagController) CreateTag(w http.ResponseWriter, r *http.Reques
 	createTagResponse, err := controller.createTagOperation.Handle(r)
 
 	if err != nil {
-		err = json.NewEncoder(w).Encode()
+		if e, ok := err.(*operationErrors.JsonInvalidStructError); ok {
+			createTagResponse = controller.consumerErrorFactory.MakeBadRequestResponse(e.Error(), Enums.JSON_INVALID_STRUCT)
+		} else if e, ok := err.(*operationErrors.ValidateError); ok {
+			createTagResponse = controller.consumerErrorFactory.MakeBadRequestResponse(e.Error(), Enums.JSON_INVALID_STRUCT)
+		} else {
+			sentry.CaptureException(err)
+		}
 	}
 
 	err = json.NewEncoder(w).Encode(createTagResponse)
@@ -63,7 +74,7 @@ func (controller *TagController) UpdateTag(w http.ResponseWriter, r *http.Reques
 	var updateTagRequest requests.UpdateTagRequest
 	params := mux.Vars(r)
 
-	paramsValidator := tagController.validatorFactory.MakeUpdateTagPathParamsValidator()
+	paramsValidator := controller.validatorFactory.MakeUpdateTagPathParamsValidator()
 
 	if err := paramsValidator.Validate(params); err != nil {
 		// ошибка 400
@@ -76,7 +87,7 @@ func (controller *TagController) UpdateTag(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	requestValidator := tagController.validatorFactory.MakeUpdateTagRequestValidator()
+	requestValidator := controller.validatorFactory.MakeUpdateTagRequestValidator()
 
 	if err := requestValidator.Validate(&updateTagRequest); err != nil {
 		// ошибка 400
@@ -85,7 +96,7 @@ func (controller *TagController) UpdateTag(w http.ResponseWriter, r *http.Reques
 	}
 
 	tagId, _ := strconv.Atoi(params["id"])
-	tag, err := tagController.tagService.GetById(tagId)
+	tag, err := controller.tagService.GetById(tagId)
 
 	if err != nil {
 		errorResponse := consumerError.NewError(1, "Тэг не найден")
@@ -97,13 +108,13 @@ func (controller *TagController) UpdateTag(w http.ResponseWriter, r *http.Reques
 
 	tag.Title = updateTagRequest.Tag.Title
 
-	if err := tagController.tagService.UpdateTag(tag); err != nil {
+	if err := controller.tagService.UpdateTag(tag); err != nil {
 		// ошибка 500
 		fmt.Fprintln(os.Stdout, err)
 		return
 	}
 
-	updateTagResponse := tagController.responseFactoryLocator.GetUpdateTagResponseFactory().Make(response.STATUS_SUCCESS)
+	updateTagResponse := controller.responseFactoryLocator.GetUpdateTagResponseFactory().Make(response.STATUS_SUCCESS)
 
 	err = json.NewEncoder(w).Encode(updateTagResponse)
 
@@ -116,7 +127,7 @@ func (controller *TagController) DeleteTag(w http.ResponseWriter, r *http.Reques
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 
-	paramsValidator := tagController.validatorFactory.MakeDeleteTagPathParamsValidator()
+	paramsValidator := controller.validatorFactory.MakeDeleteTagPathParamsValidator()
 
 	if err := paramsValidator.Validate(params); err != nil {
 		// ошибка 400
@@ -125,7 +136,7 @@ func (controller *TagController) DeleteTag(w http.ResponseWriter, r *http.Reques
 	}
 
 	id, _ := strconv.Atoi(params["id"])
-	tag, err := tagController.tagService.GetById(id)
+	tag, err := controller.tagService.GetById(id)
 
 	if err != nil {
 		// ошибка 400
@@ -133,7 +144,7 @@ func (controller *TagController) DeleteTag(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	tag.IsDeleted = true
-	err = tagController.tagService.UpdateTag(tag)
+	err = controller.tagService.UpdateTag(tag)
 
 	if err != nil {
 		// ошибка 500
@@ -155,7 +166,7 @@ func (controller *TagController) GetTagById(w http.ResponseWriter, r *http.Reque
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 
-	paramsValidator := tagController.validatorFactory.MakeGetByIdPathParamsValidator()
+	paramsValidator := controller.validatorFactory.MakeGetByIdPathParamsValidator()
 
 	if err := paramsValidator.Validate(params); err != nil {
 		// ошибка 400
@@ -168,7 +179,7 @@ func (controller *TagController) GetTagById(w http.ResponseWriter, r *http.Reque
 		sentry.CaptureException(err)
 	}
 
-	tag, err := tagController.tagService.GetById(tagId)
+	tag, err := controller.tagService.GetById(tagId)
 
 	if err != nil {
 		errorResponse := consumerError.NewError(1, "Тэг не найден")
@@ -181,7 +192,7 @@ func (controller *TagController) GetTagById(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	getTagResponse := tagController.responseFactoryLocator.GetByIdResponseFactory().Make(tag)
+	getTagResponse := controller.responseFactoryLocator.GetByIdResponseFactory().Make(tag)
 
 	err = json.NewEncoder(w).Encode(getTagResponse)
 
