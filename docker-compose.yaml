@@ -4,12 +4,12 @@ services:
     image: nginx
     build:
       context: .
-      dockerfile:
     command: ["/usr/sbin/nginx", "-g", "daemon off;"]
     working_dir: /srv
     restart: unless-stopped
-    network_mode: service:go
-      - go
+    networks:
+      - beats_pro_proxy
+      - beats-pro-db
     volumes:
       - .:/srv:ro
       - ./build/etc/nginx/conf.d/:/etc/nginx/conf.d/:ro
@@ -19,13 +19,18 @@ services:
     image: golang:latest
     build:
       context: .
-      dockerfile: ./build/docker/go/Dockerfile
+    command: ["go build srv/cmd/app/main.go", "--command=./main"]
     networks:
       - beats_pro_proxy
       - beats-pro-db
     volumes:
       - ./:/srv
     labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api-beatspro.entrypoints=http"
+      - "traefik.http.routers.api-beatspro.rule=Host(`api.beatspro.space`)"
+      - "traefik.http.services.api-beatspro.loadbalancer.server.port=8090"
+      - "traefik.docker.network=beats_pro_proxy"
 
 
 networks:

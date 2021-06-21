@@ -1,9 +1,9 @@
-FROM golang:latest
+#FROM golang:latest
 
-WORKDIR /BeatsPro
+#WORKDIR /BeatsPro
 
-COPY ./ /BeatsPro
+#COPY ./ /BeatsPro
 
-RUN go get github.com/githubnemo/CompileDaemon
+#RUN go get github.com/githubnemo/CompileDaemon
 
-ENTRYPOINT CompileDaemon --build="go build cmd/app/main.go" --command=./main
+#ENTRYPOINT CompileDaemon --build="go build cmd/app/main.go" --command=./main
