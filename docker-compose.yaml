@@ -1,23 +1,35 @@
 version: "3.5"
 services:
-  go:
+  nginx:
+    image: nginx
+    build:
+      context: .
+      dockerfile:
+    command: ["/usr/sbin/nginx", "-g", "daemon off;"]
+    working_dir: /srv
+    restart: unless-stopped
+    network_mode: service:go
+      - go
+    volumes:
+      - .:/srv:ro
+      - ./build/etc/nginx/conf.d/:/etc/nginx/conf.d/:ro
+      - ./var/logs:/srv/var/logs/:rw
+
+  api-beatspro:
+    image: golang:latest
     build:
       context: .
       dockerfile: ./build/docker/go/Dockerfile
-    ports:
-      - '80:80'
+    networks:
+      - beats_pro_proxy
+      - beats-pro-db
     volumes:
-      - ./:/BeatsPro
+      - ./:/srv
+    labels:
 
-  mysql:
-    image: mariadb
-    volumes:
-      - ./data/mysql:/var/lib/mysql
-    ports:
-      - 127.0.0.1:3306:3306
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: test
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
-    restart: always
+
+networks:
+  beats_pro_proxy:
+    external: true
+  beats-pro-db:
+    external: true

@@ -71,6 +71,7 @@ func (controller *TagController) CreateTag(w http.ResponseWriter, r *http.Reques
 
 func (controller *TagController) UpdateTag(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+
 	var updateTagRequest requests.UpdateTagRequest
 	params := mux.Vars(r)
 

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-beats-pro
+  labels:
+    app : api-beats-pro
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      project: abp
+  template:
+    metadata:
+      labels:
+        project: abp
+    spec:
+      containers:
+        - name : abp-go
+          image: golang
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api-beats-pro-autoscaling
+  spec:
+    scaleTargetRef:
+      apiVersion: apps/v2beta1v1
+      kind: Deployment
+      name: api-beats-pro
+    replicas: 2
