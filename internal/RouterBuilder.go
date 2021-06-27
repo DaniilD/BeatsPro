@@ -29,5 +29,6 @@ func (routerFactory *RouterBuilder) Build() *Router {
 			services.GetServiceLocator().GetTagService(),
 			responseFactories.GetResponseFactoryLocator(),
 		),
+		new(controllers.HealthController),
 	)
 }
