@@ -80,9 +80,11 @@ func (application *Application) Run() {
 	port := application.configLocator.ServerConfigInstance().Port
 	host := application.configLocator.ServerConfigInstance().Host
 
+	log.Print("Server Start")
 	if err := application.server.Run(host, fmt.Sprint(port), application.Router); err != nil {
 		log.Fatal(err)
 	}
+
 }
 
 func (application *Application) InitRouts() {

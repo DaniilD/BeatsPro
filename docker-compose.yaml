@@ -8,7 +8,8 @@ services:
     working_dir: /go/apiBeatsPro
     restart: unless-stopped
     networks:
-      - beats_pro_proxy
+      - beatsprotraefik_beats_pro_proxy
+      - beats-pro-internal
       - beats-pro-db
     volumes:
       - .:/go/apiBeatsPro:ro
@@ -17,8 +18,14 @@ services:
       - /var/run/docker.sock:/tmp/docker.sock:ro
     depends_on:
       - api-beatspro
-    ports:
-      - "80:80"
+    #ports:
+      #- "80:80"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api-beatspro.entrypoints=http"
+      - "traefik.http.routers.api-beatspro.rule=Host(`api.beatspro.space`)"
+      - "traefik.http.services.api-beatspro.loadbalancer.server.port=8090"
+      - "traefik.docker.network=beatsprotraefik_beats_pro_proxy"
 
   api-beatspro:
     image: golang:latest
@@ -26,23 +33,19 @@ services:
       context: .
     command: "go run cmd/app/main.go"
     networks:
-   #   - beats_pro_proxy
+      - beatsprotraefik_beats_pro_proxy
+      - beats-pro-internal
       - beats-pro-db
     volumes:
       - .:/go/apiBeatsPro
     working_dir: /go/apiBeatsPro
-    ports:
-      - "8090:8090"
-   # labels:
-    #  - "traefik.enable=true"
-    #  - "traefik.http.routers.api-beatspro.entrypoints=http"
-    #  - "traefik.http.routers.api-beatspro.rule=Host(`api.beatspro.space`)"
-    #  - "traefik.http.services.api-beatspro.loadbalancer.server.port=8090"
-     # - "traefik.docker.network=beats_pro_proxy"
-
+    #ports:
+      #- "8855:8855"
 
 networks:
- # beats_pro_proxy:
- #   external: true
   beats-pro-db:
+    external: true
+  beats-pro-internal:
+    external: true
+  beatsprotraefik_beats_pro_proxy:
     external: true

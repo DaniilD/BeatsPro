@@ -14,6 +14,7 @@ func init() {
 }
 
 func main() {
+	log.Print("Server Starting...")
 	server := internal.NewServer()
 	application := internal.NewApplication(configs.GetConfigLocator(), server)
 	application.Configure()

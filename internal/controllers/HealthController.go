@@ -1,11 +1,15 @@
 package controllers
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type HealthController struct {
 }
 
 func (controller *HealthController) Ping(w http.ResponseWriter, r *http.Request) {
-	print("test")
+	w.Header().Set("Access-Control-Allow-Methods", "GET")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 }
