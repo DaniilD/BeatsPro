@@ -4,32 +4,48 @@ services:
     image: nginx
     build:
       context: .
-      dockerfile:
     command: ["/usr/sbin/nginx", "-g", "daemon off;"]
-    working_dir: /srv
+    working_dir: /go/apiBeatsPro
     restart: unless-stopped
-    network_mode: service:go
-      - go
+    networks:
+      - beatsprotraefik_beats_pro_proxy
+      - beats-pro-internal
+      - beats-pro-db
     volumes:
-      - .:/srv:ro
+      - .:/go/apiBeatsPro:ro
       - ./build/etc/nginx/conf.d/:/etc/nginx/conf.d/:ro
       - ./var/logs:/srv/var/logs/:rw
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    depends_on:
+      - api-beatspro
+    #ports:
+      #- "80:80"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api-beatspro.entrypoints=http"
+      - "traefik.http.routers.api-beatspro.rule=Host(`api.beatspro.space`)"
+      - "traefik.http.services.api-beatspro.loadbalancer.server.port=8090"
+      - "traefik.docker.network=beatsprotraefik_beats_pro_proxy"
 
   api-beatspro:
     image: golang:latest
     build:
       context: .
-      dockerfile: ./build/docker/go/Dockerfile
+    command: "go run cmd/app/main.go"
     networks:
-      - beats_pro_proxy
+      - beatsprotraefik_beats_pro_proxy
+      - beats-pro-internal
       - beats-pro-db
     volumes:
-      - ./:/srv
-    labels:
-
+      - .:/go/apiBeatsPro
+    working_dir: /go/apiBeatsPro
+    #ports:
+      #- "8855:8855"
 
 networks:
-  beats_pro_proxy:
-    external: true
   beats-pro-db:
+    external: true
+  beats-pro-internal:
+    external: true
+  beatsprotraefik_beats_pro_proxy:
     external: true

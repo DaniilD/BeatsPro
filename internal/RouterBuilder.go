@@ -23,10 +23,12 @@ func (routerFactory *RouterBuilder) Build() *Router {
 		controllers.NewUserController(),
 		controllers.NewTagController(
 			operations.GetOperationLocator().GetCreateTagOperation(),
+			responseFactories.GetResponseFactoryLocator().GetConsumerErrorResponseFactory(),
 			requests_validators.NewValidatorFactory(),
 			Tag.NewTagFactory(),
 			services.GetServiceLocator().GetTagService(),
 			responseFactories.GetResponseFactoryLocator(),
 		),
+		new(controllers.HealthController),
 	)
 }
