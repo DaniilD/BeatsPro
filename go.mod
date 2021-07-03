@@ -9,6 +9,7 @@ require (
 	github.com/flosch/pongo2 v0.0.0-20190707114632-bbf5a6c351f4 // indirect
 	github.com/gavv/monotime v0.0.0-20190418164738-30dba4353424 // indirect
 	github.com/getsentry/sentry-go v0.10.0 // indirect
+	github.com/githubnemo/CompileDaemon v1.3.0 // indirect
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
