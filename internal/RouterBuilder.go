@@ -2,11 +2,8 @@ package internal
 
 import (
 	"BeatsPro/internal/controllers"
-	"BeatsPro/internal/models/Tag"
 	"BeatsPro/internal/operations"
-	requests_validators "BeatsPro/internal/requests/validators"
 	"BeatsPro/internal/response/responseFactories"
-	"BeatsPro/internal/services"
 	"github.com/gorilla/mux"
 )
 
@@ -23,11 +20,10 @@ func (routerFactory *RouterBuilder) Build() *Router {
 		controllers.NewUserController(),
 		controllers.NewTagController(
 			operations.GetOperationLocator().GetCreateTagOperation(),
+			operations.GetOperationLocator().GetUpdateTagOperation(),
+			operations.GetOperationLocator().GetDeleteTagOperation(),
+			operations.GetOperationLocator().GetGetByIdTagOperation(),
 			responseFactories.GetResponseFactoryLocator().GetConsumerErrorResponseFactory(),
-			requests_validators.NewValidatorFactory(),
-			Tag.NewTagFactory(),
-			services.GetServiceLocator().GetTagService(),
-			responseFactories.GetResponseFactoryLocator(),
 		),
 		new(controllers.HealthController),
 	)
