@@ -3,13 +3,13 @@ package operationErrors
 import "BeatsPro/internal/Enums"
 
 type TagNotFoundError struct {
-	code int
+	Code int
 }
 
 func NewTagNotFoundError() *TagNotFoundError {
 	error := &TagNotFoundError{}
 
-	error.code = Enums.TAG_NOT_FOUND
+	error.Code = Enums.TAG_NOT_FOUND
 	return error
 }
 
