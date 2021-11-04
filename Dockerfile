@@ -4,9 +4,8 @@ WORKDIR /go/apiBeatsPro
 
 COPY . /go/apiBeatsPro
 
-RUN chown -R root:root /go/apiBeatsPro
-
 RUN export GO111MODULE="on" && \
+    chmod +x scripts/ -R && \
     apt update && \
     apt install -y curl && \
     go mod download && \

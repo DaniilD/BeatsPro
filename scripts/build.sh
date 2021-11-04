@@ -20,7 +20,6 @@ printf "\033[36mВыполнение команд в контейнере\033[0m
 echo "================================================================================"
 printf "\033[36mУстановка Go migrate(https://github.com/golang-migrate/migrate)\033[0m\n"
 echo "================================================================================"
-curl -L https://packagecloud.io/golang-migrate/migrate/gpgkey | apt-key add -
-echo "deb https://packagecloud.io/golang-migrate/migrate/ubuntu/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/migrate.list
-apt-get update
+apt-get install -y lsb-release && apt-get clean all
+curl -s https://packagecloud.io/install/repositories/golang-migrate/migrate/script.deb.sh | bash
 apt-get install -y migrate
