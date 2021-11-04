@@ -1,0 +1,1 @@
+docker build --pull --build-arg=USER_ID=${DOCKER_UID} --build-arg=GROUP_ID=${DOCKER_GID} -t "${SERVICE_NAME}-${LOCAL_BASE_DOMAIN_SLUG}" -f build/monolith/Dockerfile.80 --target=dev .

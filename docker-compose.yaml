@@ -28,9 +28,11 @@ services:
       - "traefik.docker.network=local-space_beats_pro_proxy"
 
   api-beatspro:
+    image: "${SERVICE_NAME}-${LOCAL_BASE_DOMAIN_SLUG}"
     build:
       context: .
-      dockerfile: ./build/docker/go/Dockerfile
+      dockerfile: Dockerfile
+    command: ['CompileDaemon', '--build="go build cmd/app/main.go"', "--command=./main"]
     networks:
       - local-space_beats_pro_proxy
       - beats-pro-internal
@@ -38,8 +40,6 @@ services:
     volumes:
       - .:/go/apiBeatsPro
     working_dir: /go/apiBeatsPro
-    #ports:
-      #- "8855:8855"
 
 networks:
   local-space_beats-pro-db:
