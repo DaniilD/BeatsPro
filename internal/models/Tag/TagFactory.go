@@ -14,3 +14,8 @@ func (tagFactory *TagFactory) Make(title string, isDeleted bool) *Tag {
 
 	return tag
 }
+
+func (tagFactory *TagFactory) MakeFromRequest() *Tag {
+
+	return nil
+}
