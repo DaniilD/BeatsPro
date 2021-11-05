@@ -15,4 +15,4 @@ fi
 . "${WORK_DIR}"/.env
 
 
-migrate -path migrations -database "${DB_DRIVER}://${DB_USER}:${DB_PASSWORD}@tcp(${DB_HOST}:${DB_PORT})/${DB_NAME}" -verbose up
+migrate -path migrations-dev -database "${DB_DRIVER}://${DB_USER}:${DB_PASSWORD}@tcp(${DB_HOST}:${DB_PORT})/${DB_NAME}" -verbose up
